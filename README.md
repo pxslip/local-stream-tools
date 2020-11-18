@@ -1,3 +1,13 @@
-# OBS Multitool
+# Local Stream Tools
 
-OBS Multitool will be a stream overlay, chatbot application that runs on your local machine with OBS integration (via OBS Websocket)
+Local Stream Tools is a tool for streamers that supports a number of different tools
+
+- Create custom data driven overlays
+- Chat commands, chatbot
+  - Chat commands that interact with OBS
+- Channel Events
+  - Cheers
+  - Subs
+  - Hosts
+  - Raids
+- Donation events off of Twitch (Paypal, other providers?)
