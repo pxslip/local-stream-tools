@@ -1,18 +1,20 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <button type="button" @click="buttonClicked" class="text-white">Click Me</button>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
 
 export default {
-  name: "Home",
-  components: {
-    HelloWorld
-  }
+  name: 'Home',
+  components: {},
+  methods: {
+    buttonClicked() {
+      this.$ipc.invoke('button-click');
+    },
+  },
 };
 </script>
