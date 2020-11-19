@@ -5,13 +5,14 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 import './ipc-events';
+import startProxy from './proxy';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const scheme = 'lst';
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: scheme, privileges: { secure: true, standard: true } }]);
 
-async function createWindow() {
+async function createWindow(hash = '') {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
@@ -23,17 +24,16 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
+    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL + `#/${hash}`);
     if (!process.env.IS_TEST) {
       win.webContents.openDevTools();
     }
   } else {
     createProtocol(scheme);
     // Load the index.html when not in development
-    win.loadURL(`${scheme}://./index.html#/about`);
+    win.loadURL(`${scheme}://./index.html#/${hash}`);
   }
 }
 
@@ -85,3 +85,4 @@ if (isDevelopment) {
 }
 
 app.setAsDefaultProtocolClient(scheme);
+startProxy();
