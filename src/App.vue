@@ -6,6 +6,19 @@
   <router-view />
 </template>
 
+<script>
+export default {
+  created() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      this.$router.replace(hash);
+    } else {
+      this.$router.replce('/');
+    }
+  },
+};
+</script>
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
