@@ -13,7 +13,7 @@ export default {
     if (hash) {
       this.$router.replace(hash);
     } else {
-      this.$router.replce('/');
+      this.$router.replace('/');
     }
   },
 };

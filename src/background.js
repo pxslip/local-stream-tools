@@ -5,7 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 import './ipc-events';
-import startProxy from './proxy';
+import startExpressServer from './proxy';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const scheme = 'lst';
 
@@ -85,4 +85,4 @@ if (isDevelopment) {
 }
 
 app.setAsDefaultProtocolClient(scheme);
-startProxy();
+startExpressServer();
