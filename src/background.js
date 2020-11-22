@@ -1,11 +1,12 @@
 'use strict';
-
+import dotenv from 'dotenv';
 import { app, BrowserWindow, protocol } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 import './ipc-events';
 import startExpressServer from './proxy';
+dotenv.config({ path: '../.env.local' });
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const scheme = 'lst';
 
