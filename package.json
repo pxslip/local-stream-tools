@@ -16,6 +16,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "dotenv": "^8.2.0",
+    "electron-store": "^6.0.1",
     "keytar": "^7.2.0",
     "oauth-electron": "^2.0.8",
     "tmi.js": "^1.5.0",
