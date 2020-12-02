@@ -11,8 +11,15 @@ const info = {
   redirectUrl: 'http://localhost:30303/authenticate',
 };
 
-window = new BrowserWindow({ webPreferences: { nodeIntegration: false } });
+/**
+ * Get a token from twitch
+ */
+function getToken() {
+  window = new BrowserWindow({ webPreferences: { nodeIntegration: false } });
+  const response = await oauth.oauth2(info, window, session);
+  return response;
+}
 
-const response = await oauth.oauth2(info, window, session);
-
-export default response;
+export {
+  getToken
+};
