@@ -13,7 +13,7 @@ export default {
   components: {},
   methods: {
     buttonClicked() {
-      this.$ipc.invoke('button-click');
+      this.$ipc.invoke('twitch::auth::get-token');
     },
   },
 };

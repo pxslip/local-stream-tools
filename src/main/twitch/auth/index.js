@@ -1,5 +1,3 @@
-import { getToken } from 'get-token';
+import { beginAuthCodeFlow } from './get-token';
 
-export default {
-  getToken,
-};
+export { beginAuthCodeFlow };

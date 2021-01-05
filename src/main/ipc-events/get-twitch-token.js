@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
-import { getToken } from '../twitch/auth';
+import { beginAuthCodeFlow } from '../twitch/auth';
 
-ipcMain.handle('twitch::auth::get-token', () => {
-  const token = getToken();
+ipcMain.handle('twitch::auth::get-token', async () => {
+  const token = await beginAuthCodeFlow();
 });

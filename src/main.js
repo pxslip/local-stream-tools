@@ -1,14 +1,15 @@
 'use strict';
 import dotenv from 'dotenv';
 import { app, BrowserWindow, protocol } from 'electron';
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
+import { handler,errorHandler } from 'vue-cli-plugin-electron-builder/lib/createProtocol';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
+import routes from './main/routes';
 import './main/ipc-events';
-import startExpressServer from './proxy';
+import { startExpressServer } from './proxy';
 dotenv.config({ path: '../.env.local' });
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const scheme = 'lst';
+const scheme = process.env.LST_SCHEME ?? 'lst';
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: scheme, privileges: { secure: true, standard: true } }]);
@@ -25,6 +26,14 @@ async function createWindow(hash = '') {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+  protocol.registerBufferProtocol(scheme, async (request, respond) => {
+    let url = new URL(request.url);
+    // use the pathname to route to a handler method if exists, return to the default handler otherwise
+    if (url.pathname in routes) {
+      return await route[url.pathname](request, respond);
+    }
+    return handler(request, respond);
+  }, errorHandler);
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL + `#/${hash}`);
@@ -32,7 +41,6 @@ async function createWindow(hash = '') {
       win.webContents.openDevTools();
     }
   } else {
-    createProtocol(scheme);
     // Load the index.html when not in development
     win.loadURL(`${scheme}://./index.html#/${hash}`);
   }
