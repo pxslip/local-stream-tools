@@ -44,9 +44,9 @@ export function beginAuthCodeFlow(closedCb) {
 }
 
 /**
- * 
- * @param {Express.Request} req 
- * @param {Express.Response} res 
+ *
+ * @param {Express.Request} req
+ * @param {Express.Response} res
  */
 export function oauthReceiver(req, res) {
   keytar.setPassword('twitch', 'lst', req.query.code);
@@ -58,11 +58,11 @@ export function oauthReceiver(req, res) {
  */
 export function getToken() {
   const promise = new Promise((resolve, reject) => {
-    keytar.getPassword('twitch', 'lst').then((code) => {
+    keytar.getPassword('twitch', 'lst').then(code => {
       resolve(code);
     });
     beginAuthCodeFlow(() => {
-      keytar.getPassword('twitch', 'lst').then((code) => {
+      keytar.getPassword('twitch', 'lst').then(code => {
         resolve(code);
       });
     });

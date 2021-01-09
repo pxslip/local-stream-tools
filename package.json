@@ -51,6 +51,7 @@
     "spectron": "11.0.0",
     "typescript": "~3.9.3",
     "vue-cli-plugin-electron-builder": "^2.0.0-rc.5",
+    "vue-cli-plugin-tailwind": "^2.0.1",
     "vue-jest": "^5.0.0-0"
   },
   "gitHooks": {
