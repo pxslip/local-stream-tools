@@ -9,4 +9,14 @@ module.exports = {
       mainProcessWatch: ['src/main/**/*.js', 'src/lib/**/*.js'],
     },
   },
+  configureWebpack: {
+    resolve: {
+      alias: {
+        '@r': './src/renderer',
+        '@m': './src/main',
+        '@m.ipc': './src/main/ipc',
+        '@lib': './src/main/lib',
+      }
+    }
+  }
 };
