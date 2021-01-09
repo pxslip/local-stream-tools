@@ -5,7 +5,7 @@ import { handler,errorHandler } from 'vue-cli-plugin-electron-builder/lib/create
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 import routes from './main/routes';
-import './main/ipc-events';
+import './main/ipc';
 import { startExpressServer } from './proxy';
 dotenv.config({ path: '../.env.local' });
 const isDevelopment = process.env.NODE_ENV !== 'production';

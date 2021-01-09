@@ -1,3 +1,3 @@
-import { beginAuthCodeFlow } from './get-token';
+import { beginAuthCodeFlow, oauthReceiver, getToken } from './get-token';
 
-export { beginAuthCodeFlow };
+export { beginAuthCodeFlow, oauthReceiver, getToken };

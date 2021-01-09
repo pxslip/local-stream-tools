@@ -1,12 +1,11 @@
 import { BrowserWindow } from 'electron';
 import crypto from 'crypto';
 import { URLSearchParams } from 'url';
-import { ipcMain } from 'electron';
 import keytar from 'keytar';
 
 // use implicit flow to avoid needing the client secret
 const clientId = process.env.CLIENT_ID;
-const redirectUri = 'lst://oauth-receiver';
+const redirectUri = 'http://localhost:30303/oauth-receiver';
 const baseUri = 'https://id.twitch.tv/oauth2';
 const scopes = 'chat:read';
 const state = crypto.randomBytes(64).toString('base64');
@@ -25,36 +24,48 @@ tokenParams.set('grant_type', 'authorization_code');
 tokenParams.set('client_secret', process.env.CLIENT_SECRET);
 
 const tokenBaseUrl = `${baseUri}/token?`;
+let window;
 
 /**
  * Get a token from twitch
  */
-async function beginAuthCodeFlow() {
+export function beginAuthCodeFlow(closedCb) {
   try {
     //create the window that will be used to do auth
-    const window = new BrowserWindow({ webPreferences: { nodeIntegration: false } });
+    window = new BrowserWindow({ webPreferences: { nodeIntegration: false } });
     window.show();
     window.webContents.openDevTools();
     window.loadURL(authorizeUrl);
+    window.on('closed', () => {
+      window = null;
+      closedCb();
+    });
   } catch (exc) {}
 }
+
 /**
  * 
- * @param {URL} url 
+ * @param {Express.Request} req 
+ * @param {Express.Response} res 
  */
-async function getToken(url) {
-  try {
-    if (state !== url.searchParams.get('state')) {
-      // bail out as our state params don't match...
-      return;
-    }
-    tokenParams.append('code', url.searchParams.get('code'));
-    const response = await fetch(`${tokenBaseUrl}${tokenParams.toString()}`);
-    const data = response.json();
-    
-  } catch (exc) {
-    throw exc;
-  }
+export function oauthReceiver(req, res) {
+  keytar.setPassword('twitch', 'lst', req.query.code);
+  window.close();
 }
 
-export { beginAuthCodeFlow, getToken };
+/**
+ * @returns {Promise}
+ */
+export function getToken() {
+  const promise = new Promise((resolve, reject) => {
+    keytar.getPassword('twitch', 'lst').then((code) => {
+      resolve(code);
+    });
+    beginAuthCodeFlow(() => {
+      keytar.getPassword('twitch', 'lst').then((code) => {
+        resolve(code);
+      });
+    });
+  });
+  return promise;
+}

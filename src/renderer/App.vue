@@ -10,17 +10,6 @@
 export default {
   created() {
     let hash = window.location.hash.replace('#', '');
-    if (hash.startsWith('access_token=')) {
-      const params = new URLSearchParams(window.location.search);
-      let args = {
-        token: hash.replace('access_token=', ''),
-        scope: params.get('scope'),
-        token_type: params.get('token_type'),
-        state: params.get('state'),
-      };
-      console.log(args);
-      this.$ipc.invoke('twitch::auth::store-token', args);
-    }
     if (hash) {
       this.$router.replace(hash);
     } else {
