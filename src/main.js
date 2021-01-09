@@ -9,7 +9,7 @@ import './main/ipc-events';
 import { startExpressServer } from './proxy';
 dotenv.config({ path: '../.env.local' });
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const scheme = process.env.LST_SCHEME ?? 'lst';
+const scheme = process.env.LST_SCHEME || 'lst';
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: scheme, privileges: { secure: true, standard: true } }]);
