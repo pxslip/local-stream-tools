@@ -12,8 +12,8 @@ export default {
   name: 'Home',
   components: {},
   methods: {
-    buttonClicked() {
-      this.$ipc.invoke('button-click');
+    async buttonClicked() {
+      const token = await this.$ipc.invoke('twitch::auth::get-token');
     },
   },
 };

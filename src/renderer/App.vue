@@ -9,7 +9,7 @@
 <script>
 export default {
   created() {
-    const hash = window.location.hash.replace('#', '');
+    let hash = window.location.hash.replace('#', '');
     if (hash) {
       this.$router.replace(hash);
     } else {
