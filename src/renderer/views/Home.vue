@@ -1,7 +1,6 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <button type="button" @click="buttonClicked" class="text-white">Click Me</button>
+
   </div>
 </template>
 
@@ -12,9 +11,7 @@ export default {
   name: 'Home',
   components: {},
   methods: {
-    async buttonClicked() {
-      const token = await this.$ipc.invoke('twitch::auth::get-token');
-    },
+    async buttonClicked() {},
   },
 };
 </script>

@@ -1,1 +1,1 @@
-import './twitch/auth/get-token';
+import './auth/twitch/get-token';
