@@ -15,7 +15,6 @@ module.exports = {
         '@r': './src/renderer',
         '@m': './src/main',
         '@m.ipc': './src/main/ipc',
-        '@lib': './src/main/lib',
       },
     },
   },

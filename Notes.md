@@ -1,5 +1,6 @@
 # Local Stream Tools
 
+For chat - use a client credentials flow to get an access token for `localstreamtoolsbot` and connect it to 
 - Chat commands, chatbot
   - Chat commands that interact with OBS
 - Channel Events
