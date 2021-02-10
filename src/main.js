@@ -7,7 +7,6 @@ import path from 'path';
 import routes from './main/routes';
 import './main/ipc';
 import { startExpressServer } from './proxy';
-import './assets/tailwind.css';
 dotenv.config({ path: '../.env.local' });
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const scheme = process.env.LST_SCHEME || 'lst';

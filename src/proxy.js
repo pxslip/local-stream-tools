@@ -1,6 +1,5 @@
 import express from 'express';
-import keytar from 'keytar';
-import { oauthReceiver } from './main/twitch/auth/get-token';
+import { oauthReceiver } from './main/auth/twitch/get-token';
 
 const app = express();
 
