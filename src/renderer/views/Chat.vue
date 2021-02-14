@@ -9,48 +9,48 @@
 </template>
 
 <script>
-import { client } from 'tmi.js';
 export default {
   data() {
     return {
-      token: null,
-      client: null,
       channel: '',
       lastChannel: '',
       messages: [],
+      commands: null,
+      /**
+       * @type {Map<string, MessagePort>}
+       */
+      msgChannels: new Map(),
     };
-  },
-  async mounted() {
-    if (!this.token) {
-      // make sure we have a twitch auth token
-      this.token = await this.$ipc.invoke('auth::twitch::get-token');
-    }
-    if (!this.client) {
-      this.client = new client({
-        connection: { reconnect: true },
-        identity: {
-          username: 'localstreamtoolsbot',
-          password: this.token.access_token,
-        },
-      });
-      this.client.connect();
-      this.client.on('message', this.handleMessage);
-    }
-  },
-  unmounted() {
-    this.client = null;
   },
   methods: {
     joinChannel() {
-      if (this.lastChannel !== '' && this.lastChannel !== this.channel) {
-        this.client.part(this.lastChannel);
-        this.lastChannel = this.channel;
-      }
-      this.client.join(this.channel);
+      const currentChannel = this.channel;
+      const { port1, port2 } = new MessageChannel();
+      this.$ipc.postMessage('chat::join-channel', { channel: this.channel }, [port1]);
+      this.msgChannels.set(channel, port2);
+      port2.addEventListener('message', event => {
+        console.log(event);
+        // this.handleMessage(currentChannel)
+      });
     },
+    /**
+     * @param {*} channel
+     * @param {*} tags
+     * @param {String} message
+     */
     handleMessage(channel, tags, message, self) {
       console.log(channel, tags, message, self);
       this.messages.push(message);
+      // TODO: fix the prefix default
+      if (message.startsWith('!')) {
+        const commandName = message.split(' ')[0].replace('!', '');
+        const command = this.commands.find(value => {
+          return value.name === commandName;
+        });
+        if (command) {
+          this.client.say(channel, command.action);
+        }
+      }
     },
   },
 };

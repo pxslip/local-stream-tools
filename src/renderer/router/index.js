@@ -20,6 +20,16 @@ const routes = [
     name: 'Chat',
     component: () => import(/* wepbackChunkName: "chat" */ '../views/Chat.vue'),
   },
+  {
+    path: '/commands',
+    name: 'Commands',
+    component: () => import(/* webpackChunkName: "commands" */ '../views/Commands.vue'),
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import(/* webpackChunkName: "settings" */ '../views/Settings.vue'),
+  },
 ];
 
 const router = createRouter({
