@@ -7,7 +7,7 @@ import path from 'path';
 import routes from './main/routes';
 import './main/ipc';
 import { startExpressServer } from './proxy';
-dotenv.config({ path: '../.env.local' });
+dotenv.config({ path: path.resolve(__dirname, '..', '.env.local') });
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const scheme = process.env.LST_SCHEME || 'lst';
 
