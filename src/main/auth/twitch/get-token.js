@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import jwks from 'jwks-rsa';
 import URLBuilder from './url-builder';
 
+//TODO: Stop doing essentially globals...
 /**
  * @type {BrowserWindow}
  */
@@ -12,7 +13,7 @@ let window;
 /**
  * @type {Object}
  */
-let token;
+let token = {};
 
 /**
  * @type {Object}
@@ -24,6 +25,20 @@ let clientCredentials;
  */
 const builder = new URLBuilder();
 
+async function setOrUpdateToken(tokenData) {
+  // verify the token
+  if (tokenData.id_token) {
+    const client = jwks({
+      jwksUri: builder.keysUri,
+    });
+    const key = await client.getSigningKeyAsync('1');
+    tokenData.user_data = jwt.verify(tokenData.id_token, key.publicKey || key.rsaPublicKey);
+  }
+  token = Object.assign(token, tokenData);
+  await keytar.setPassword('lst', 'twitch', JSON.stringify(token));
+  return token;
+}
+
 /**
  * Get a token from twitch
  * @param {*} closedCb
@@ -34,7 +49,7 @@ export function beginAuthCodeFlow(closedCb) {
     window = new BrowserWindow({ webPreferences: { nodeIntegration: false } });
     window.show();
     window.webContents.openDevTools();
-    window.loadURL(builder.getAuthUrl());
+    window.loadURL(builder.getAuthUrl('chat:read chat:edit channel:moderate openid'));
     window.on('closed', () => {
       window = null;
       closedCb();
@@ -48,19 +63,11 @@ export function beginAuthCodeFlow(closedCb) {
  * @param {Express.Response} res
  */
 export async function oauthReceiver(req, res) {
-  if (req.query.state === state) {
+  if (builder.validateState(req.query.state)) {
     try {
       // get the oauth token, refresh token
-      tokenParams.append('code', req.query.code);
-      const response = await axios.post(`${tokenBaseUrl}${tokenParams.toString()}`);
-      token = response.data;
-      // verify the token
-      const client = jwks({
-        jwksUri: builder.keysUri,
-      });
-      const key = await client.getSigningKeyAsync('1');
-      token.user_data = jwt.verify(token.id_token, key.publicKey || key.rsaPublicKey);
-      await keytar.setPassword('lst', 'twitch', JSON.stringify(token));
+      const response = await axios.post(builder.getTokenUrl(req.query.code));
+      await setOrUpdateToken(response.data);
     } catch (exc) {
       console.error(exc);
     }
@@ -81,16 +88,31 @@ export function getToken() {
         token = JSON.parse(tokenData);
       }
     }
-    if (token) {
-      // verify that our token is still valid
-      const resp = await axios.get(builder.verifyUrl, {
-        headers: {
-          Authorization: `Oauth ${token.access_token}`,
-        },
-      });
-      if (resp.status === 200) {
-        resolve(token);
-        return;
+    if (token.access_token) {
+      try {
+        // verify that our token is still valid
+        const resp = await axios.get(builder.verifyUrl, {
+          headers: {
+            Authorization: `OAuth ${token.access_token}`,
+          },
+        });
+        if (resp.status === 200) {
+          resolve(token);
+          return;
+        }
+      } catch (exc) {
+        if (exc.response.status !== 401) {
+          reject(exc);
+          return;
+        }
+        try {
+          const response = await axios.post(builder._baseTokenUri, builder.getRefreshUrl(token.refresh_token));
+          await setOrUpdateToken(response.data);
+          resolve(token);
+          return;
+        } catch (exc) {
+          reject(exc);
+        }
       }
     }
     beginAuthCodeFlow(() => {

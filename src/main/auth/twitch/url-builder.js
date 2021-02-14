@@ -8,24 +8,13 @@ export default class URLBuilder {
     this.baseUri = 'https://id.twitch.tv/oauth2';
     this.keysUri = 'https://id.twitch.tv/oauth2/keys';
     this.verifyUrl = 'https://id.twitch.tv/oauth2/validate';
-    this._clientId = process.env.CLIENT_ID;
-    this._clientSecret = process.env.CLIENT_SECRET;
-    this._authParams = new URLSearchParams();
-    this._tokenParams = new URLSearchParams();
-    this._clientParams = new URLSearchParams();
+    this._authParams = null;
+    this._tokenParams = null;
+    this._clientParams = null;
+    this._refreshParams = null;
     this._baseAuthUri = '';
     this._baseTokenUri = '';
     this._states = [];
-    this._authParams.append('client_id', this._clientId);
-    this._authParams.append('redirect_uri', this.redirectUri);
-    this._authParams.append('response_type', 'code');
-    this._tokenParams.append('client_id', this._clientId);
-    this._tokenParams.append('client_secret', this._clientSecret);
-    this._tokenParams.append('grant_type', 'authorization_code');
-    this._tokenParams.append('redirect_uri', this.redirectUri);
-    this._clientParams.append('client_id', this._clientId);
-    this._clientParams.append('client_secret', this._clientSecret);
-    this._clientParams.append('grant_type', 'client_credentials');
     this._baseAuthUri = `${this.baseUri}/authorize?`;
     this._baseTokenUri = `${this.baseUri}/token?`;
   }
@@ -36,7 +25,9 @@ export default class URLBuilder {
    * @returns a base 64 encoded string with byte length of the length provided
    */
   generateState(length = 64) {
-    return crypto.randomBytes(length).toString('base64');
+    const state = crypto.randomBytes(length).toString('base64');
+    this._states.push(state);
+    return state;
   }
 
   /**
@@ -45,10 +36,7 @@ export default class URLBuilder {
    * @returns The url to open in a browser
    */
   getAuthUrl(scope = 'chat:read openid') {
-    this._authParams.append('scope', scope);
-    const state = this.generateState()
-    this._states.push(state);
-    this._authParams.append('state', state);
+    this.authParams.set('scope', scope);
     return `${this._baseAuthUri}${this._authParams.toString()}`;
   }
 
@@ -58,12 +46,87 @@ export default class URLBuilder {
    * @returns The url to query to get the actual token
    */
   getTokenUrl(code) {
-    this._tokenParams.append('code', code);
+    this.tokenParams.set('code', code);
     return `${this._baseTokenUri}${this._tokenParams.toString()}`;
   }
 
-  getClientCredentialsUrl(scope = 'chat:read') {
-    this._clientParams.append('scope', scope);
-    return `${this._baseTokenUri}${this._clientParams.toString()}`
+  getClientCredentialsUrl(scope = 'chat:read chat:edit channel:moderate') {
+    this.clientParams.set('scope', scope);
+    return `${this._baseTokenUri}${this._clientParams.toString()}`;
+  }
+
+  /**
+   * 
+   * @param {string} refreshToken 
+   * @returns {Object} an object with all of the params to pass to the refresh request
+   */
+  getRefreshUrl(refreshToken) {
+    this.refreshParams.set('refresh_token', refreshToken);
+    return this.refreshParams;
+  }
+
+  validateState(state) {
+    const index = this._states.indexOf(state);
+    if (index >= 0) {
+      this._states.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  get _clientId() {
+    return process.env.CLIENT_ID;
+  }
+
+  get _clientSecret() {
+    return process.env.CLIENT_SECRET;
+  }
+
+  get authParams() {
+    if (!this._authParams) {
+      const params = new URLSearchParams();
+      params.set('client_id', this._clientId);
+      params.set('redirect_uri', this.redirectUri);
+      params.set('response_type', 'code');
+      this._authParams = params;
+    }
+    this._authParams.set('state', this.generateState());
+    return this._authParams;
+  }
+
+  get tokenParams() {
+    if (!this._tokenParams) {
+      const params = new URLSearchParams();
+      params.set('client_id', this._clientId);
+      params.set('client_secret', this._clientSecret);
+      params.set('grant_type', 'authorization_code');
+      params.set('redirect_uri', this.redirectUri);
+      this._tokenParams = params;
+    }
+    this._tokenParams.set('state', this.generateState());
+    return this._tokenParams;
+  }
+
+  get clientParams() {
+    if (!this._clientParams) {
+      const params = new URLSearchParams();
+      params.set('client_id', this._clientId);
+      params.set('client_secret', this._clientSecret);
+      params.set('grant_type', 'client_credentials');
+      this._clientParams = params;
+    }
+    this._clientParams.set('state', this.generateState());
+    return this._clientParams;
+  }
+
+  get refreshParams() {
+    if (!this._refreshParams) {
+      const params = new URLSearchParams();
+      params.set('client_id', this._clientId);
+      params.set('client_secret', this._clientSecret);
+      params.set('grant_type', 'refresh_token');
+      this._refreshParams = params;
+    }
+    return this._refreshParams;
   }
 }
