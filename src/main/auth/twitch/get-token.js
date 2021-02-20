@@ -13,7 +13,7 @@ let window;
 /**
  * @type {Object}
  */
-let token = {};
+let token;
 
 /**
  * @type {Object}
