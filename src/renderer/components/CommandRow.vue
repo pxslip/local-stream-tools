@@ -1,14 +1,26 @@
 <template>
-  <div><input type="text" class="w-full" v-model="name" /></div>
-  <div><input type="text" class="w-full" v-model="desc" /></div>
+  <div><input type="text" class="w-full text-gray-900" v-model="name" /></div>
+  <div><input type="text" class="w-full text-gray-900" v-model="desc" /></div>
   <div>
-    <select v-model="type" class="w-full">
+    <select v-model="type" class="w-full text-gray-900" @change="typeChanged">
       <option value="response">Chat Response</option>
       <option value="obs">OBS Action</option>
     </select>
   </div>
-  <div><input type="text" class="w-full" v-model="action" /></div>
-  <button type="button" @click="store">
+  <div v-if="type === 'response'">
+    <input type="text" class="w-full text-gray-900" v-model="action" />
+  </div>
+  <div v-else-if="type === 'obs'">
+    <select v-model="action.name" class="w-full text-gray-900">
+      <option value="toggle_source">Toggle a Source</option>
+    </select>
+    <input type="text" v-model="action.sourceName" class="w-full text-gray-900" />
+  </div>
+  <button
+    type="button"
+    @click="store"
+    class="border border-blue-100 rounded-md bg-gray-600 hover:bg-gray-200 hover:text-gray-800"
+  >
     <slot name="action">
       Submit
     </slot>
@@ -25,7 +37,7 @@ export default {
         return {
           name: '',
           desc: '',
-          type: '',
+          type: 'response',
           action: '',
         };
       },
@@ -33,7 +45,7 @@ export default {
     resetAfterStore: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   data() {
     return {
@@ -45,9 +57,14 @@ export default {
   },
   methods: {
     store() {
-      this.$emit('store', {name: this.name, desc: this.desc, type: this.type, action: this.action});
-    }
-  }
+      this.$emit('store', { name: this.name, desc: this.desc, type: this.type, action: this.action });
+    },
+    typeChanged() {
+      if (this.type === 'obs') {
+        this.action = {};
+      }
+    },
+  },
 };
 </script>
 

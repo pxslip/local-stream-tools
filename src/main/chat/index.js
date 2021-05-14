@@ -21,3 +21,4 @@ export async function getClient() {
   await client.connect();
   return client;
 }
+

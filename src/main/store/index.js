@@ -6,20 +6,20 @@ const schema = {
     items: {
       type: 'object',
       properties: {
-        command: {type: 'string'},
-        type: {type: 'string'},
-      }
-    }
+        command: { type: 'string' },
+        type: { type: 'string' },
+      },
+    },
   },
   prefix: {
-    type: 'string'
-  }
-}
+    type: 'string',
+  },
+};
 
 const store = new Store();
 
 /**
- * 
+ *
  * @param {string} key the config key to set
  * @param {any} value the value to assign to said key
  */
@@ -28,12 +28,26 @@ export function set(key, value) {
 }
 
 /**
- * 
+ *
  * @param {string} key the config key to get
  * @param {any} defaultValue the default if the config key does not exist
  * @returns
  */
 export function get(key, defaultValue) {
   const val = store.get(key, defaultValue);
+  return val;
+}
+
+/**
+ *
+ * @param {String} key
+ * @param {Array} defaultValue
+ * @returns {Array}
+ */
+export function getArray(key, defaultValue = []) {
+  const val = get(key, defaultValue);
+  if (!Array.isArray(val)) {
+    throw new Error('Tried to retrieve an stored value that was not an array');
+  }
   return val;
 }

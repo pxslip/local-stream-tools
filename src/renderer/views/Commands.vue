@@ -6,7 +6,7 @@
     <div>Type</div>
     <div>Action</div>
     <div></div>
-    <template v-for="(command,index) in commands" :key="`chat_command_${index}`">
+    <template v-for="(command, index) in commands" :key="`chat_command_${index}`">
       <command-row :command="command" @store="storeCommand($event, index)">
         <template v-slot:action>
           Update
@@ -19,7 +19,6 @@
       </template>
     </command-row>
   </div>
-
 </template>
 
 <script>
@@ -30,7 +29,7 @@ export default {
     return {
       commands: [],
       prefix: '',
-    }
+    };
   },
   async mounted() {
     this.commands = await this.$ipc.invoke('store::get', 'commands', []);
@@ -39,7 +38,7 @@ export default {
   methods: {
     /**
      * Store a new command/update an existing one
-     * 
+     *
      * @param {Object} command the new command data to store/update
      * @param {Object|null} index the index of the command if we are updating a command
      */
@@ -51,11 +50,9 @@ export default {
         this.commands[index] = command;
         this.$ipc.invoke('store::set-array-by-index', 'commands', index, command);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
