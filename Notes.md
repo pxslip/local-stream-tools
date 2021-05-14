@@ -3,6 +3,10 @@
 For chat - use a client credentials flow to get an access token for `localstreamtoolsbot` and connect it to
 
 - Chat commands, chatbot
+  - General Purpose Chat Commands
+    - Queues
+    - Polls
+    - Text output
   - Chat commands that interact with OBS
 - Channel Events
   - Cheers
@@ -30,3 +34,12 @@ For chat - use a client credentials flow to get an access token for `localstream
 Handling websocket connections:
 
 My inclination is to move all heavy lifting to the main process, so both twitch chat and obs websocket are handled by `main` and `renderer` just uses IPC to subscribe to events via MessageChannels
+
+## 05/13/2021
+
+### To Do Today
+
+- [] Re-confirm auth and chat is working
+- [] Build a basic text output chat command
+  - [] Need to be able to store/edit commands
+- []
