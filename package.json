@@ -19,7 +19,7 @@
     "core-js": "^3.6.5",
     "dotenv": "^8.2.0",
     "electron-store": "^6.0.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^1.12.2",
     "keytar": "^7.2.0",
     "oauth-electron": "^2.0.8",
